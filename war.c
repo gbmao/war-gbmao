@@ -32,6 +32,8 @@ typedef struct territory {
 // --- Protótipos das Funções ---
 // Declarações antecipadas de todas as funções que serão usadas no programa, organizadas por categoria.
 territory addTerritory();
+void showMap(int totalTerritories,territory map[]);
+void createMap(int totalTerritories, territory map[]);
 // Funções de setup e gerenciamento de memória:
 // Funções de interface com o usuário:
 // Funções de lógica principal do jogo:
@@ -46,18 +48,11 @@ int main() {
     // - Aloca a memória para o mapa do mundo e verifica se a alocação foi bem-sucedida.
     // - Preenche os territórios com seus dados iniciais (tropas, donos, etc.).
     territory map[5];
-
-    for (int i = 0; i < 5; i++)
-    {
-        printf("\n\n--- Cadastrando Territorio %d ---", i + 1);
-        map[i] = addTerritory();
-    }
+    createMap(2,map);
+    
 
 
-    for (int i = 0; i < 5; i++)
-    {
-        printf("\nTERRITORIO %d:\n- Nome: %s\n- Controlado por: %s\n- Tropas: %d",i +1, map[i].name, map[i].color, map[i].troops);
-    }
+    showMap(2, map);
     
 
     // - Define a cor do jogador e sorteia sua missão secreta.
@@ -85,6 +80,13 @@ int main() {
 
 // inicializarTerritorios():
 // Preenche os dados iniciais de cada território no mapa (nome, cor do exército, número de tropas).
+void createMap(int totalTerritories, territory map[]) {
+    for (int i = 0; i < totalTerritories; i++)
+    {
+        printf("\n\n--- Cadastrando Territorio %d ---", i + 1);
+        map[i] = addTerritory();
+    }
+} 
 // Esta função modifica o mapa passado por referência (ponteiro).
 territory addTerritory() {
     territory t;
@@ -109,9 +111,19 @@ territory addTerritory() {
 // exibirMenuPrincipal():
 // Imprime na tela o menu de ações disponíveis para o jogador.
 
+
+
 // exibirMapa():
 // Mostra o estado atual de todos os territórios no mapa, formatado como uma tabela.
 // Usa 'const' para garantir que a função apenas leia os dados do mapa, sem modificá-los.
+void showMap(int totalTerritories,territory map[]) {
+
+
+for (int i = 0; i < totalTerritories; i++)
+    {
+        printf("\nTERRITORIO %d:\n- Nome: %s\n- Controlado por: %s\n- Tropas: %d",i +1, map[i].name, map[i].color, map[i].troops);
+    }
+}
 
 // exibirMissao():
 // Exibe a descrição da missão atual do jogador com base no ID da missão sorteada.
