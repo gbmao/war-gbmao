@@ -21,12 +21,12 @@
 
 // --- Constantes Globais ---
 // Definem valores fixos para o número de territórios, missões e tamanho máximo de strings, facilitando a manutenção.
-
+#define STRING_SIZE 50
 // --- Estrutura de Dados ---
 // Define a estrutura para um território, contendo seu nome, a cor do exército que o domina e o número de tropas.
 typedef struct Territory {
-    char name[50];
-    char color[50];
+    char name[STRING_SIZE];
+    char color[STRING_SIZE];
     int troops;
 } Territory; 
 
@@ -41,8 +41,11 @@ void showMap(int totalTerritories,Territory map[]);
 void createMap(int totalTerritories, Territory map[]);
 // Funções de setup e gerenciamento de memória:
 // Funções de interface com o usuário:
+void showMenu(int totalTerritories,Territory map[]);
+void attackMenu(int totalTerritories);
 // Funções de lógica principal do jogo:
 // Função utilitária:
+void clearInput();
 
 // --- Função Principal (main) ---
 // Função principal que orquestra o fluxo do jogo, chamando as outras funções em ordem.
@@ -53,21 +56,20 @@ int main() {
     // - Aloca a memória para o mapa do mundo e verifica se a alocação foi bem-sucedida.
     int totalTerritories = numberTerritory();
     struct Territory *map = mapSize(totalTerritories);
+    clearInput();
     if(map == NULL){
         printf("Falha ao alocar memoria!");
         return 1;
     }
     
-
-    
     // - Preenche os territórios com seus dados iniciais (tropas, donos, etc.).
     
     createMap(totalTerritories,map);
     
-    showMap(totalTerritories, map);
-    
+    //showMap(totalTerritories, map);
+     
 
-
+    showMenu(totalTerritories, map);
     // - Define a cor do jogador e sorteia sua missão secreta.
 
     // 2. Laço Principal do Jogo (Game Loop):
@@ -81,16 +83,17 @@ int main() {
 
     // 3. Limpeza:
     // - Ao final do jogo, libera a memória alocada para o mapa para evitar vazamentos de memória.
-
+    free(map);
     return 0;
 }
 
 // --- Implementação das Funções ---
 
 int numberTerritory() {
-    printf("Digite o numero de territorios: ");
     int totalTerritories;
+    printf("Digite o numero de territorios: ");
     scanf("%d", &totalTerritories);
+    clearInput();
     
     return totalTerritories;
 }
@@ -121,12 +124,15 @@ Territory addTerritory() {
 
     printf("\n\nDigite o nome do território: ");
     scanf("%s", t.name);
+    clearInput();
 
     printf("Digite a cor do território: ");
     scanf("%s", t.color);
+    clearInput();
 
     printf("Digite o número de tropas: ");
     scanf("%d", &t.troops);
+    clearInput();
 
     printf("\nVocê adicionou:");
     printf("\nTerritório: %s, Controlado por: %s, Total de tropas: %d", t.name, t.color, t.troops);
@@ -136,8 +142,19 @@ Territory addTerritory() {
 // liberarMemoria():
 // Libera a memória previamente alocada para o mapa usando free.
 
+
+
+
 // exibirMenuPrincipal():
 // Imprime na tela o menu de ações disponíveis para o jogador.
+
+void showMenu(int totalTerritories,Territory map[]){
+    
+showMap( totalTerritories, map);
+attackMenu(totalTerritories);
+
+    
+}
 
 
 
@@ -155,11 +172,11 @@ for (int i = 0; i < 50; i++)
 {
     printf("=");
 }
-printf("\n\n");
+printf("\n");
 
 for (int i = 0; i < totalTerritories; i++)
     {
-        printf("\n\nTERRITORIO %d:\n  - Nome: %s\n  - Controlado por: %s\n  - Tropas: %d",i +1, map[i].name, map[i].color, map[i].troops);
+        printf("\n%d.%s (Exercito: %s, Tropas: %d)",i +1, map[i].name, map[i].color, map[i].troops);
     }
 }
 
@@ -169,6 +186,18 @@ for (int i = 0; i < totalTerritories; i++)
 // faseDeAtaque():
 // Gerencia a interface para a ação de ataque, solicitando ao jogador os territórios de origem e destino.
 // Chama a função simularAtaque() para executar a lógica da batalha.
+
+void attackMenu(int totalTerritories) {
+    printf("\n\n----- FASE DE ATAQUE -----\n");
+    printf("Escolha o territorio atacante(1 a %d, ou 0 para SAIR): ", totalTerritories);
+    int attack;
+    scanf("%d", &attack);
+
+    printf("Escolha o territorio defensor(1 a %d): ", totalTerritories);
+    int defense;
+    scanf("%d", &defense);
+
+}
 
 // simularAtaque():
 // Executa a lógica de uma batalha entre dois territórios.
@@ -183,5 +212,9 @@ for (int i = 0; i < totalTerritories; i++)
 // Implementa a lógica para cada tipo de missão (destruir um exército ou conquistar um número de territórios).
 // Retorna 1 (verdadeiro) se a missão foi cumprida, e 0 (falso) caso contrário.
 
-// limparBufferEntrada():
+// clearInput():
 // Função utilitária para limpar o buffer de entrada do teclado (stdin), evitando problemas com leituras consecutivas de scanf e getchar.
+void clearInput() {
+    int c;
+    while((c = getchar()) != '\n' && c != EOF);
+}
