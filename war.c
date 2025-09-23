@@ -117,11 +117,21 @@ territory addTerritory() {
 // Mostra o estado atual de todos os territórios no mapa, formatado como uma tabela.
 // Usa 'const' para garantir que a função apenas leia os dados do mapa, sem modificá-los.
 void showMap(int totalTerritories,territory map[]) {
-
+printf("\n\n");
+for (int i = 0; i < 50; i++)
+{
+    printf("=");
+}
+printf("\n\tMAPA DO MUNDO - ESTADO ATUAL\n");
+for (int i = 0; i < 50; i++)
+{
+    printf("=");
+}
+printf("\n\n");
 
 for (int i = 0; i < totalTerritories; i++)
     {
-        printf("\nTERRITORIO %d:\n- Nome: %s\n- Controlado por: %s\n- Tropas: %d",i +1, map[i].name, map[i].color, map[i].troops);
+        printf("\n\nTERRITORIO %d:\n  - Nome: %s\n  - Controlado por: %s\n  - Tropas: %d",i +1, map[i].name, map[i].color, map[i].troops);
     }
 }
 
