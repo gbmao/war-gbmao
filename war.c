@@ -6,6 +6,7 @@
 //
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 // OBJETIVOS:
 // - Modularizar completamente o código em funções especializadas.
 // - Implementar um sistema de missões para um jogador.
@@ -23,17 +24,21 @@
 
 // --- Estrutura de Dados ---
 // Define a estrutura para um território, contendo seu nome, a cor do exército que o domina e o número de tropas.
-typedef struct territory {
+typedef struct Territory {
     char name[50];
     char color[50];
     int troops;
-} territory; 
+} Territory; 
 
 // --- Protótipos das Funções ---
 // Declarações antecipadas de todas as funções que serão usadas no programa, organizadas por categoria.
-territory addTerritory();
-void showMap(int totalTerritories,territory map[]);
-void createMap(int totalTerritories, territory map[]);
+
+int numberTerritory();
+struct Territory * mapSize(int totalTerritories);
+
+Territory addTerritory();
+void showMap(int totalTerritories,Territory map[]);
+void createMap(int totalTerritories, Territory map[]);
 // Funções de setup e gerenciamento de memória:
 // Funções de interface com o usuário:
 // Funções de lógica principal do jogo:
@@ -46,14 +51,22 @@ int main() {
     // - Define o locale para português.
     // - Inicializa a semente para geração de números aleatórios com base no tempo atual.
     // - Aloca a memória para o mapa do mundo e verifica se a alocação foi bem-sucedida.
+    int totalTerritories = numberTerritory();
+    struct Territory *map = mapSize(totalTerritories);
+    if(map == NULL){
+        printf("Falha ao alocar memoria!");
+        return 1;
+    }
+    
+
+    
     // - Preenche os territórios com seus dados iniciais (tropas, donos, etc.).
-    territory map[5];
-    createMap(2,map);
+    
+    createMap(totalTerritories,map);
+    
+    showMap(totalTerritories, map);
     
 
-
-    showMap(2, map);
-    
 
     // - Define a cor do jogador e sorteia sua missão secreta.
 
@@ -74,13 +87,28 @@ int main() {
 
 // --- Implementação das Funções ---
 
+int numberTerritory() {
+    printf("Digite o numero de territorios: ");
+    int totalTerritories;
+    scanf("%d", &totalTerritories);
+    
+    return totalTerritories;
+}
+
 // alocarMapa():
 // Aloca dinamicamente a memória para o vetor de territórios usando calloc.
 // Retorna um ponteiro para a memória alocada ou NULL em caso de falha.
 
+struct Territory * mapSize(int totalTerritories) {
+    
+    return (struct Territory *) calloc(totalTerritories, sizeof(struct Territory));
+     
+}
+
+
 // inicializarTerritorios():
 // Preenche os dados iniciais de cada território no mapa (nome, cor do exército, número de tropas).
-void createMap(int totalTerritories, territory map[]) {
+void createMap(int totalTerritories, Territory map[]) {
     for (int i = 0; i < totalTerritories; i++)
     {
         printf("\n\n--- Cadastrando Territorio %d ---", i + 1);
@@ -88,8 +116,8 @@ void createMap(int totalTerritories, territory map[]) {
     }
 } 
 // Esta função modifica o mapa passado por referência (ponteiro).
-territory addTerritory() {
-    territory t;
+Territory addTerritory() {
+    Territory t;
 
     printf("\n\nDigite o nome do território: ");
     scanf("%s", t.name);
@@ -116,7 +144,7 @@ territory addTerritory() {
 // exibirMapa():
 // Mostra o estado atual de todos os territórios no mapa, formatado como uma tabela.
 // Usa 'const' para garantir que a função apenas leia os dados do mapa, sem modificá-los.
-void showMap(int totalTerritories,territory map[]) {
+void showMap(int totalTerritories,Territory map[]) {
 printf("\n\n");
 for (int i = 0; i < 50; i++)
 {
