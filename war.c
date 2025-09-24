@@ -42,8 +42,9 @@ void createMap(int totalTerritories, Territory map[]);
 // Funções de setup e gerenciamento de memória:
 // Funções de interface com o usuário:
 void showMenu(int totalTerritories,Territory map[]);
-void attackMenu(int totalTerritories);
+int attackMenu(int totalTerritories, Territory map[]);
 // Funções de lógica principal do jogo:
+void attack(int attacker,int defender, Territory map[]);
 // Função utilitária:
 void clearInput();
 
@@ -150,9 +151,12 @@ Territory addTerritory() {
 
 void showMenu(int totalTerritories,Territory map[]){
     
-showMap( totalTerritories, map);
-attackMenu(totalTerritories);
+    int flag = 1;
+    do {
 
+    showMap( totalTerritories, map);
+    flag = attackMenu(totalTerritories, map);
+    }while (flag);
     
 }
 
@@ -187,22 +191,77 @@ for (int i = 0; i < totalTerritories; i++)
 // Gerencia a interface para a ação de ataque, solicitando ao jogador os territórios de origem e destino.
 // Chama a função simularAtaque() para executar a lógica da batalha.
 
-void attackMenu(int totalTerritories) {
+int attackMenu(int totalTerritories, Territory map[]) {
+    int flag = 1;
     printf("\n\n----- FASE DE ATAQUE -----\n");
-    printf("Escolha o territorio atacante(1 a %d, ou 0 para SAIR): ", totalTerritories);
-    int attack;
-    scanf("%d", &attack);
-
-    printf("Escolha o territorio defensor(1 a %d): ", totalTerritories);
+    int attacking;
     int defense;
-    scanf("%d", &defense);
 
+    do {
+
+    printf("Escolha o territorio atacante(1 a %d, ou 0 para SAIR): ", totalTerritories);
+    scanf("%d", &attacking);
+    clearInput();
+    if(attacking == 0) return 0;
+        if(map[attacking-1].troops < 2) {
+            printf("\n%s possui apenas %d tropa e não pode atacar!\n", map[attacking-1].name, map[attacking-1].troops);
+        } else {
+            flag = 0;
+        }
+    } while(flag);
+    flag = 1;
+    do {
+    printf("Escolha o territorio defensor(1 a %d): ", totalTerritories);
+    scanf("%d", &defense);
+    clearInput();
+        if(defense == attacking) {
+            printf("Voce nao pode escolher o mesmo territorio! escolha novamente\n ");
+            flag = 1;
+        } else if(strcmp(map[attacking-1].color, map[defense -1].color) == 0){
+            printf("\nO territorio defensor possui a mesma cor do atacante!\n");
+        } else {
+            flag = 0;
+        }
+    }while(flag);
+
+    attack(attacking -1,defense -1,map);
+    printf("\nPressione ENTER para continuar para o proximo turno...\n\n");
+    getchar();
+    return 1;
+    
 }
 
 // simularAtaque():
 // Executa a lógica de uma batalha entre dois territórios.
 // Realiza validações, rola os dados, compara os resultados e atualiza o número de tropas.
 // Se um território for conquistado, atualiza seu dono e move uma tropa.
+void attack(int attacker, int defender, Territory map[]){
+
+    int num = (rand() % 6) + 1;
+    printf("\nO atacante %s rolou um dado e tirou: %d", map[attacker].name, num);
+    int num2 = (rand() % 6) + 1;
+    printf("\nO defensor %s rolou um dado e tirou: %d", map[defender].name, num2);
+
+    if(num > num2) { // attack wins
+        num = num - num2;
+        printf("\nVITORIA DO ATAQUE! O defensor perdeu %d", num);
+        map[defender].troops -= num;
+        if(map[defender].troops < 1) {
+            printf("\nCONQUISTA! O territorio %s foi dominado pelo exercito %s", map[defender].name, map[attacker].color);
+            //map[defender].color = map[attacker].color;
+            strcpy(map[defender].color, map[attacker].color);
+            map[defender].troops = 1;
+
+        }
+    
+    } else if (num < num2) {
+        num = num2 - num;
+        printf("\nVITORIA DA DEFESA! O atacante perdeu 1 tropa");
+        map[attacker].troops -= 1;
+    } else {
+        printf("\nEmpate ninguem perde tropas\n");
+    }
+}
 
 // sortearMissao():
 // Sorteia e retorna um ID de missão aleatório para o jogador.
