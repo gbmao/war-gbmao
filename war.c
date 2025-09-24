@@ -30,6 +30,14 @@ typedef struct Territory {
     int troops;
 } Territory; 
 
+typedef struct Player {
+    char color[STRING_SIZE];
+    char mission[STRING_SIZE];
+    struct Territory *maps;
+    int currentSize;
+
+} Player;
+
 // --- Protótipos das Funções ---
 // Declarações antecipadas de todas as funções que serão usadas no programa, organizadas por categoria.
 
@@ -41,6 +49,7 @@ void showMap();
 void createMap();
 // Funções de setup e gerenciamento de memória:
 // Funções de interface com o usuário:
+void choseColor();
 void showMenu();
 int attackMenu();
 // Funções de lógica principal do jogo:
@@ -49,6 +58,13 @@ void attack(int attacker,int defender);
 void clearInput();
 int totalTerritories;
 struct Territory *map;
+void createMockMap();
+
+void addAllTerritoriesWithSameColorToPlayer();
+void addTerritoryToPlayer(int location);
+Player createPlayer();
+
+Player p ;
 
 // --- Função Principal (main) ---
 // Função principal que orquestra o fluxo do jogo, chamando as outras funções em ordem.
@@ -57,17 +73,19 @@ int main() {
     // - Define o locale para português.
     // - Inicializa a semente para geração de números aleatórios com base no tempo atual.
     // - Aloca a memória para o mapa do mundo e verifica se a alocação foi bem-sucedida.
-    totalTerritories = numberTerritory();
-    map = mapSize();
-    clearInput();
-    if(map == NULL){
-        printf("Falha ao alocar memoria!");
-        return 1;
-    }
-    
+
+    // totalTerritories = numberTerritory();
+    // map = mapSize();
+    // if(map == NULL){
+    //     printf("Falha ao alocar memoria!");
+    //     return 1;
+    // }
     // - Preenche os territórios com seus dados iniciais (tropas, donos, etc.).
     
-    createMap();
+    //createMap();
+    p = createPlayer(); 
+    createMockMap();
+    choseColor();
     
     //showMap(totalTerritories, map);
      
@@ -91,6 +109,15 @@ int main() {
 }
 
 // --- Implementação das Funções ---
+
+Player createPlayer() {
+    Player p;
+    p.currentSize = 0;
+    p.maps = NULL;
+    p.color[0] = '\0';   // string vazia
+    p.mission[0] = '\0'; // string vazia
+    return p;
+}
 
 int numberTerritory() {
     int totalTerritories;
@@ -146,7 +173,57 @@ Territory addTerritory() {
 // Libera a memória previamente alocada para o mapa usando free.
 
 
+void choseColor() {
+    printf("\n---- ESCOLHA SUA COR ----\n");
+    for (int i = 0; i < totalTerritories; i++)
+    {
+        printf("%d. %s\n",i+1, map[i].color);
+    }
 
+    printf("Sua escolha: \n");
+
+    int response;
+    scanf("%d", &response);
+
+    
+    strcpy(p.color, map[response -1].color);
+
+    printf("p.color: %s\n", p.color);
+
+    // addTerritoryToPlayer(response -1);
+
+    // printf("p.map: %s\n", p.maps[0].color);
+    // printf("p.map: %d\n", p.maps[0].troops);
+
+    addAllTerritoriesWithSameColorToPlayer();
+
+    // for (int i = 0; i < p.currentSize; i++)
+    // {
+    //     printf("p.map: %s\n", p.maps[i].name);
+    // }
+    
+}
+
+void addAllTerritoriesWithSameColorToPlayer() {
+
+    for(int i = 0; i < totalTerritories; i++){
+        if(strcmp(p.color, map[i].color) == 0){
+            printf("p.color : %s == map.color: %s\n", p.color, map[i].color);
+            addTerritoryToPlayer(i);
+        }
+    } 
+}
+
+void addTerritoryToPlayer(int location){
+    p.currentSize++;
+    p.maps = realloc(p.maps, (p.currentSize) * sizeof(Territory));
+    if(p.maps ==  NULL){
+        printf("Nao alocou memoria\n");
+    }
+
+    p.maps[p.currentSize -1] = map[location];
+    
+}
 
 // exibirMenuPrincipal():
 // Imprime na tela o menu de ações disponíveis para o jogador.
@@ -279,3 +356,34 @@ void clearInput() {
     int c;
     while((c = getchar()) != '\n' && c != EOF);
 }
+
+
+void createMockMap() {
+    totalTerritories = 5; // define quantos territórios
+    map = mapSize();
+    if (map == NULL) {
+        printf("Falha ao alocar memoria!");
+        exit(1);
+    }
+
+    strcpy(map[0].name, "Brasil");
+    strcpy(map[0].color, "Vermelho");
+    map[0].troops = 5;
+
+    strcpy(map[1].name, "Argentina");
+    strcpy(map[1].color, "Azul");
+    map[1].troops = 3;
+
+    strcpy(map[2].name, "Chile");
+    strcpy(map[2].color, "Vermelho");
+    map[2].troops = 4;
+
+    strcpy(map[3].name, "Peru");
+    strcpy(map[3].color, "Azul");
+    map[3].troops = 2;
+
+    strcpy(map[4].name, "Colombia");
+    strcpy(map[4].color, "Vermelho");
+    map[4].troops = 6;
+}
+
