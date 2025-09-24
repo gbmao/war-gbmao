@@ -23,6 +23,7 @@
 // --- Constantes Globais ---
 // Definem valores fixos para o número de territórios, missões e tamanho máximo de strings, facilitando a manutenção.
 #define STRING_SIZE 50
+#define TOTAL_MISSIONS 5
 // --- Estrutura de Dados ---
 // Define a estrutura para um território, contendo seu nome, a cor do exército que o domina e o número de tropas.
 typedef struct Territory {
@@ -33,11 +34,16 @@ typedef struct Territory {
 
 typedef struct Player {
     char color[STRING_SIZE];
-    char mission[STRING_SIZE];
     struct Territory *maps;
     int currentSize;
+    int missionID;
 
 } Player;
+
+typedef struct Mission {
+    int missionID;
+    char missionDescription[STRING_SIZE];
+} Mission;
 
 // --- Protótipos das Funções ---
 // Declarações antecipadas de todas as funções que serão usadas no programa, organizadas por categoria.
@@ -68,9 +74,10 @@ void createMockMap();
 
 void addAllTerritoriesWithSameColorToPlayer();
 void addTerritoryToPlayer(int location);
-Player createPlayer();
+Player createPlayer(Mission missions[]);
 
 Player p ;
+struct Mission* missions;
 
 // --- Função Principal (main) ---
 // Função principal que orquestra o fluxo do jogo, chamando as outras funções em ordem.
@@ -78,9 +85,10 @@ int main() {
     // 1. Configuração Inicial (Setup):
     // - Define o locale para português.
     // - Inicializa a semente para geração de números aleatórios com base no tempo atual.
+    srand(time(NULL));
     // - Aloca a memória para o mapa do mundo e verifica se a alocação foi bem-sucedida.
      if(createGame() == 1) return 1;
-    
+
     showMenu();
     // - Define a cor do jogador e sorteia sua missão secreta.
 
@@ -97,40 +105,49 @@ int main() {
     // - Ao final do jogo, libera a memória alocada para o mapa para evitar vazamentos de memória.
     free(map);
     free(p.maps);
+    free(missions);
     return 0;
 }
 
 // --- Implementação das Funções ---
 
-Player createPlayer() {
-    srand(time(NULL));
+struct Mission * createMissions() {
+   // (struct Territory *) calloc(totalTerritories, sizeof(struct Territory));
+     struct Mission* missions =  malloc(TOTAL_MISSIONS * sizeof(struct Mission));
+     // criando manualmente as missoes
+     missions[0].missionID = 1; 
+     strcpy(missions[0].missionDescription, "Domine 3 Territorios");
+
+     missions[1].missionID = 2; 
+     strcpy(missions[1].missionDescription, "Domine 2 Territorios");
+
+     missions[2].missionID = 3; 
+     strcpy(missions[2].missionDescription, "Destrua exercito azul");
+
+     missions[3].missionID = 4; 
+     strcpy(missions[3].missionDescription, "Destrua exercito amarelo");
+
+     missions[4].missionID = 5; 
+     strcpy(missions[4].missionDescription, "Destrua exercito verde");
+
+     return missions;
+
+} 
+
+Player createPlayer( Mission missions[]) {
+    
     Player p;
     p.currentSize = 0;
     p.maps = NULL;
-    p.color[0] = '\0';   // string vazia
-    p.mission[0] = '\0'; // string vazia
-    switch ((rand() % 3)) 
-    {
-    case 0 :
-        strcpy(p.mission, "Domine 3 Territorios");
-        break;
-
-    case 1 :
-        strcpy(p.mission, "Domine 2 Territorios");
-        break;
+    p.color[0] = '\0';   
+    // TODO melhorar sistema de missao
+    p.missionID = rand() % TOTAL_MISSIONS;
     
-    case 2 :
-        strcpy(p.mission, "Destrua exercito azul");
-        break;
-
-    default:
-        break;
-    }
     return p;
 }
 
 int checkMission() {
-    if (strcmp(p.mission, "Domine 3 Territorios") == 0) {
+    if (p.missionID == 0) {
         
         if(p.currentSize >= 3) {
             
@@ -139,7 +156,7 @@ int checkMission() {
             return 1;
         }
 
-    } else if (strcmp(p.mission, "Domine 2 Territorios") == 0) {
+    } else if (p.missionID == 1) {
 
         if(p.currentSize >= 2) {
             printf("\n --- VITORIA ---\n");
@@ -147,7 +164,7 @@ int checkMission() {
             return 1;
         }
         return 0;
-    } else if (strcmp(p.mission, "Destrua exercito azul") == 0) {
+    } else if (p.missionID == 2) {
         
         for (int i = 0; i < totalTerritories; i++)
         {
@@ -157,6 +174,32 @@ int checkMission() {
         }
         printf("\n --- VITORIA ---\n");
         printf("\n VOCE DESTRUIU EXERCITO AZUL\n");
+        
+        return 1;
+        
+    } else if (p.missionID == 3) {
+        
+        for (int i = 0; i < totalTerritories; i++)
+        {
+            if(strcmp(map[i].color, "amarelo") == 0) {
+                return 0;
+            }
+        }
+        printf("\n --- VITORIA ---\n");
+        printf("\n VOCE DESTRUIU EXERCITO AMARELO\n");
+        
+        return 1;
+        
+    } else if (p.missionID == 4) {
+        
+        for (int i = 0; i < totalTerritories; i++)
+        {
+            if(strcmp(map[i].color, "verde") == 0) {
+                return 0;
+            }
+        }
+        printf("\n --- VITORIA ---\n");
+        printf("\n VOCE DESTRUIU EXERCITO VERDE\n");
         
         return 1;
         
@@ -193,7 +236,8 @@ int createGame(){
     }
 
     createMap();
-    p = createPlayer(); 
+     missions  = createMissions();
+    p = createPlayer(missions); 
     
    // createMockMap();
     choseColor();
@@ -295,7 +339,7 @@ void showMenu(){
 
     showMap( totalTerritories, map);
     printf("\n\n------ MISSAO -------\n");
-    printf("%s.\n", p.mission);
+    printf("%s.\n", missions[p.missionID].missionDescription);
     printf("\n --- MENU DE ACOES --- \n");
     printf("1 - Atacar\n");
     printf("2 - Verificar Missao\n");
@@ -317,7 +361,7 @@ void showMenu(){
     
     case 2:
         printf("\n\n------ MISSAO -------\n");
-        printf("%s.\n", p.mission);
+        printf("%s.\n", missions[p.missionID].missionDescription);
         printf("\nPressione ENTER para voltar ao menu...\n\n");
         getchar();
         break;
