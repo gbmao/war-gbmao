@@ -34,19 +34,21 @@ typedef struct Territory {
 // Declarações antecipadas de todas as funções que serão usadas no programa, organizadas por categoria.
 
 int numberTerritory();
-struct Territory * mapSize(int totalTerritories);
+struct Territory * mapSize();
 
 Territory addTerritory();
-void showMap(int totalTerritories,Territory map[]);
-void createMap(int totalTerritories, Territory map[]);
+void showMap();
+void createMap();
 // Funções de setup e gerenciamento de memória:
 // Funções de interface com o usuário:
-void showMenu(int totalTerritories,Territory map[]);
-int attackMenu(int totalTerritories, Territory map[]);
+void showMenu();
+int attackMenu();
 // Funções de lógica principal do jogo:
-void attack(int attacker,int defender, Territory map[]);
+void attack(int attacker,int defender);
 // Função utilitária:
 void clearInput();
+int totalTerritories;
+struct Territory *map;
 
 // --- Função Principal (main) ---
 // Função principal que orquestra o fluxo do jogo, chamando as outras funções em ordem.
@@ -55,8 +57,8 @@ int main() {
     // - Define o locale para português.
     // - Inicializa a semente para geração de números aleatórios com base no tempo atual.
     // - Aloca a memória para o mapa do mundo e verifica se a alocação foi bem-sucedida.
-    int totalTerritories = numberTerritory();
-    struct Territory *map = mapSize(totalTerritories);
+    totalTerritories = numberTerritory();
+    map = mapSize();
     clearInput();
     if(map == NULL){
         printf("Falha ao alocar memoria!");
@@ -65,12 +67,12 @@ int main() {
     
     // - Preenche os territórios com seus dados iniciais (tropas, donos, etc.).
     
-    createMap(totalTerritories,map);
+    createMap();
     
     //showMap(totalTerritories, map);
      
 
-    showMenu(totalTerritories, map);
+    showMenu();
     // - Define a cor do jogador e sorteia sua missão secreta.
 
     // 2. Laço Principal do Jogo (Game Loop):
@@ -103,7 +105,7 @@ int numberTerritory() {
 // Aloca dinamicamente a memória para o vetor de territórios usando calloc.
 // Retorna um ponteiro para a memória alocada ou NULL em caso de falha.
 
-struct Territory * mapSize(int totalTerritories) {
+struct Territory * mapSize() {
     
     return (struct Territory *) calloc(totalTerritories, sizeof(struct Territory));
      
@@ -112,7 +114,7 @@ struct Territory * mapSize(int totalTerritories) {
 
 // inicializarTerritorios():
 // Preenche os dados iniciais de cada território no mapa (nome, cor do exército, número de tropas).
-void createMap(int totalTerritories, Territory map[]) {
+void createMap() {
     for (int i = 0; i < totalTerritories; i++)
     {
         printf("\n\n--- Cadastrando Territorio %d ---", i + 1);
@@ -149,7 +151,7 @@ Territory addTerritory() {
 // exibirMenuPrincipal():
 // Imprime na tela o menu de ações disponíveis para o jogador.
 
-void showMenu(int totalTerritories,Territory map[]){
+void showMenu(){
     
     int flag = 1;
     do {
@@ -165,7 +167,7 @@ void showMenu(int totalTerritories,Territory map[]){
 // exibirMapa():
 // Mostra o estado atual de todos os territórios no mapa, formatado como uma tabela.
 // Usa 'const' para garantir que a função apenas leia os dados do mapa, sem modificá-los.
-void showMap(int totalTerritories,Territory map[]) {
+void showMap() {
 printf("\n\n");
 for (int i = 0; i < 50; i++)
 {
@@ -191,7 +193,7 @@ for (int i = 0; i < totalTerritories; i++)
 // Gerencia a interface para a ação de ataque, solicitando ao jogador os territórios de origem e destino.
 // Chama a função simularAtaque() para executar a lógica da batalha.
 
-int attackMenu(int totalTerritories, Territory map[]) {
+int attackMenu() {
     int flag = 1;
     printf("\n\n----- FASE DE ATAQUE -----\n");
     int attacking;
@@ -224,7 +226,7 @@ int attackMenu(int totalTerritories, Territory map[]) {
         }
     }while(flag);
 
-    attack(attacking -1,defense -1,map);
+    attack(attacking -1,defense -1);
     printf("\nPressione ENTER para continuar para o proximo turno...\n\n");
     getchar();
     return 1;
@@ -235,7 +237,7 @@ int attackMenu(int totalTerritories, Territory map[]) {
 // Executa a lógica de uma batalha entre dois territórios.
 // Realiza validações, rola os dados, compara os resultados e atualiza o número de tropas.
 // Se um território for conquistado, atualiza seu dono e move uma tropa.
-void attack(int attacker, int defender, Territory map[]){
+void attack(int attacker, int defender){
 
     int num = (rand() % 6) + 1;
     printf("\nO atacante %s rolou um dado e tirou: %d", map[attacker].name, num);
@@ -251,7 +253,7 @@ void attack(int attacker, int defender, Territory map[]){
             //map[defender].color = map[attacker].color;
             strcpy(map[defender].color, map[attacker].color);
             map[defender].troops = 1;
-
+            
         }
     
     } else if (num < num2) {
